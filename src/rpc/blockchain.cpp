@@ -6,6 +6,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <rpc/blockchain.h>
+#include <veil/budget.h>
 
 #include <amount.h>
 #include <base58.h>
@@ -175,6 +176,27 @@ static UniValue getblockcount(const JSONRPCRequest& request)
 
     LOCK(cs_main);
     return chainActive.Height();
+}
+
+static UniValue getnextsuperblock(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 0)
+        throw std::runtime_error(
+            "getnextsuperblock\n"
+            "\nPrint the next super block height\n"
+
+            "\nResult:\n"
+            "n      (numeric) Block height of the next super block\n"
+
+            "\nExamples:\n"
+            + HelpExampleCli("getnextsuperblock", "")
+            + HelpExampleRpc("getnextsuperblock", "")
+        );
+
+    CBlockIndex* pindexPrev = chainActive.Tip();
+    if (!pindexPrev) return "unknown";
+
+    return veil::BudgetParams::GetNextSuperBlock(pindexPrev->nHeight);
 }
 
 static UniValue getbestblockhash(const JSONRPCRequest& request)
@@ -2319,6 +2341,7 @@ static const CRPCCommand commands[] =
     { "blockchain",         "getblockheader",         &getblockheader,         {"blockhash","verbose"} },
     { "blockchain",         "getchaintips",           &getchaintips,           {} },
     { "blockchain",         "getdifficulty",          &getdifficulty,          {} },
+    { "blockchain",         "getnextsuperblock",      &getnextsuperblock,      {} },
     { "blockchain",         "getmempoolancestors",    &getmempoolancestors,    {"txid","verbose"} },
     { "blockchain",         "getmempooldescendants",  &getmempooldescendants,  {"txid","verbose"} },
     { "blockchain",         "getmempoolentry",        &getmempoolentry,        {"txid"} },

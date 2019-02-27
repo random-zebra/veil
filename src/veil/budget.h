@@ -22,7 +22,8 @@ private:
     std::string labAddress;
 
 public:
-    static bool IsSuperBlock(int nBlockHeight);
+    static bool IsSuperBlock(const int nBlockHeight);
+    static int GetNextSuperBlock(const int nBlockHeight);
     static BudgetParams* Get();
 
     static void GetBlockRewards(int nBlockHeight,

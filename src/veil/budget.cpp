@@ -64,12 +64,23 @@ bool CheckBudgetTransaction(const int nHeight, const CTransaction& tx, CValidati
  * Rewards are based upon the height of the block.
  * @param nBlockHeight
  */
-bool BudgetParams::IsSuperBlock(int nBlockHeight)
+bool BudgetParams::IsSuperBlock(const int nBlockHeight)
 {
     return (
             (Params().NetworkIDString() == "main" && nBlockHeight % nBlocksPerPeriod == 0) ||
             (Params().NetworkIDString() == "test" && (nBlockHeight % nBlocksPerPeriod == 20000 || nBlockHeight == 1))
             );
+}
+
+int BudgetParams::GetNextSuperBlock(const int nBlockHeight)
+{
+    if (Params().NetworkIDString() == "test") {
+        if (nBlockHeight == 0)
+            return 1;
+        return nBlockHeight - nBlockHeight % nBlocksPerPeriod + nBlocksPerPeriod + 20000;
+    }
+
+    return nBlockHeight - nBlockHeight % nBlocksPerPeriod + nBlocksPerPeriod;
 }
 
 void BudgetParams::GetBlockRewards(int nBlockHeight, CAmount& nBlockReward,
